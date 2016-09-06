@@ -22,12 +22,16 @@ def put(name, snippet):
   
 
 def get(name):
-    """Retrieve the snippet with a given name to return snippet"""
+    """Retrieve the snippet with a given name to return snippet. 
+    If snippet not found, return 404 snippet not found error"""
     logging.info("Retrieving snippet {!r}".format(name))
     cursor = connection.cursor()
     command = "select message from snippets where keyword=%s"
     cursor.execute(command, (name,))
     row = cursor.fetchone()
+    if not row:
+        # No snippet was found with that name.
+        return "404: Snippet Not Found"
     return row[0]
     #return cursor.fetchone()
     #logging.error("FIXME: Unimplemented - get({!r})".format(name))
