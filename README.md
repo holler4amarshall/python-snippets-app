@@ -16,6 +16,17 @@ Snippets are stored in a simple format: keyword, message.
 
 2) Postgres database installed/started
 
+3) Database created: 
+
+      createdb snippets
+      
+4) On command line, run the schema.sql file in order to create the basic tables
+
+      psql -d snippets < schema.sql
+      
+5) Use the post commands below to set up some basic records in the snippets database. 
+      
+
 ### Commands
 
 Given that the program is downloaded, any of the following commands can be executed from the project's root folder, in order to utilise the program: 
