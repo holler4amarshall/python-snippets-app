@@ -44,6 +44,8 @@ def catalogue():
     command = "select keyword from snippets order by keyword DESC"
     cursor.execute(command, ())
     results = cursor.fetchall()
+    if not results:
+        return "404: Snippet Not Found"
     keywords = ''
     for keyword in results: 
         keywords = keywords + keyword[0] + '; '
