@@ -27,15 +27,43 @@ Get a list of the names of all snippets:
 
 Get the details of a snippet, using a specific name
 Note that the names can be found via the previous command
+Note that only snippets allowed to be found via search will be returned (eg, 'hidden = false')
 
      python3 snippets.py get <snippet_name>
 
 
 Search for a snippet using any string, to find matching snippets that contain the string in the message
+Note that only snippets allowed to be found via search will be returned (eg, 'hidden = false')
 
      python3 snippets.py search <search_query>
 
 Add a new snippet to the database, providing snippet name and snippet message
+Note that if no optional arguments are supplied, the snippet will be searchable by default (eg, hidden = false)
 
-     python3 snippets.py put <snippet_name>  <snippet_message>
+     python3 snippets.py post <snippet_name>  <snippet_message>
+
+
+Add a new snippet to the database, with optional hidden argument, so that snippet cannot be searched
+
+     python3 snippets.py post <snippet_name>  <snippet_message>  --hide
+     
+
+## Future updates
+A lot more work can be done to this code! 
+Ideas include: 
+
+create a function to update snippet
+- include an optional argument to update the hidden flag to true or false
+
+add error handling for
+- duplicate snippet name
+- database cannot be contacted
+- unexpected error from database
+
+improve data storage
+- store keys, messages in standard format (eg, convert user input to all lower case)
+- search for keys in standard format (eg, convert user input to all lower case)
+- do not allow duplicate keys to be created in DB for same value, different capitalisation
+
+improve logging
 
