@@ -51,19 +51,19 @@ def catalogue():
         
 def search(search_criteria):
     '''Return any snippets that contain the given search criteria in message'''
-    logging.info("Retrieving snippets that contain {!r}".format(search_criteria))
+    logging.info("Retrieving snippets that contain '{!r}'".format(search_criteria))
     cursor = connection.cursor()
-    command = "select message from snippets where message like %s"
+    search_criteria = '%' + search_criteria + '%'
+    command = "select keyword, message from snippets where message like (%s)"
     cursor.execute(command, (search_criteria,))
-    results = cursor.fetchone()
-    print(results)
-    messages = results
-    if not messages:
+    results = cursor.fetchall()
+    statement = ''
+    for keyword, message in results: 
+        statement = statement + keyword + ': ' + message + '; '
+    print(statement)
+    if not results:
         return "404: Snippet Not Found"
-    #messages = ''
-    #for message in results:
-    #    messages = message + message[0] + '; '
-    return messages
+    return statement[:-1]
 
 def main():
     """Main function"""
@@ -95,7 +95,7 @@ def main():
     
 
 
-    arguments = parser.parse_args()   
+    arguments = parser.parse_args()
     # Convert parsed arguments from Namespace to dictionary
     arguments = vars(arguments)
     command = arguments.pop("command")
@@ -107,8 +107,9 @@ def main():
         keywords = catalogue()
         print("Retrieving all snippet names: {!r}".format(keywords))
     if command == "search":
-        search_criteria = search(**arguments)
-        print("Retrieving all snippets that contain: {!r}".format(search_criteria))
+        params = arguments['search_criteria']
+        search_query = search(**arguments)
+        print("Retrieved all snippets that contain string: {!r}".format(params))
     elif command == "get":
         snippet = get(**arguments)
         print("Retrieved snippet: {!r}".format(snippet))
