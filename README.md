@@ -8,6 +8,16 @@ The app utilises [logging](https://docs.python.org/3/library/logging.html), [arg
 
 Snippets are stored in a simple format: keyword, message. 
 
+## User Guide
+
+### Pre-requisites
+
+1) Download the project
+
+2) Postgres database installed/started
+
+### Commands
+
 Given that the program is downloaded, any of the following commands can be executed from the project's root folder, in order to utilise the program: 
 
 Get a list of the names of all snippets: 
@@ -29,7 +39,3 @@ Add a new snippet to the database, providing snippet name and snippet message
 
      python3 snippets.py put <snippet_name>  <snippet_message>
 
-## Pre-requisites
-
-1) Download the project
-2) Postgres database installed/started
