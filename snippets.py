@@ -10,12 +10,12 @@ connection = psycopg2.connect(database="snippets")
 logging.debug("Database connection established.")
 
 
-def put(name, snippet, hidden='false'):
+def post(name, snippet, hide='false'):
     '''Store a snippet with an associated name.'''
     logging.info("Storing snippet {!r}: {!r}".format(name, snippet))
     cursor = connection.cursor()
     command = "insert into snippets values (%s, %s, %s)"
-    cursor.execute(command, (name, snippet, hidden))
+    cursor.execute(command, (name, snippet, hide))
     connection.commit()
     logging.debug("Snippet stored successfully.")
     return name, snippet
@@ -74,12 +74,12 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
-    # Subparser for the put command
-    logging.debug("Constructing put subparser")
-    put_parser = subparsers.add_parser("put", help="Store a snippet")
-    put_parser.add_argument("name", help="Name of the snippet")
-    put_parser.add_argument("snippet", help="Snippet text")
-    put_parser.add_argument("-hi", "--hide", help="Optional argument to hide snippet from being searched by name", action="store_true")
+    # Subparser for the post command
+    logging.debug("Constructing post subparser")
+    post_parser = subparsers.add_parser("post", help="Create a new snippet")
+    post_parser.add_argument("name", help="Name of the snippet")
+    post_parser.add_argument("snippet", help="Snippet text")
+    post_parser.add_argument("-hi", "--hide", help="Optional argument to hide snippet from being searched by name", action="store_true")
     
     # Subparser for the get command
     logging.debug("Constructing get subparser")
@@ -102,12 +102,12 @@ def main():
     arguments = vars(args)
     command = arguments.pop("command")
 
-    if command == "put":
+    if command == "post":
         if args.hide:
-            name, snippet = put(**arguments)
+            name, snippet = post(**arguments)
             print("Stored hidden key as {!r} as {!r}".format(snippet, name))
         else: 
-            name, snippet = put(**arguments)
+            name, snippet = post(**arguments)
             print("Stored searchable key as {!r} as {!r}".format(snippet, name))
     if command == "catalogue":
         keywords = catalogue()
