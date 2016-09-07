@@ -11,7 +11,7 @@ logging.debug("Database connection established.")
 
 
 def put(name, snippet):
-    """Store a snippet with an associated name."""
+    '''Store a snippet with an associated name.'''
     logging.info("Storing snippet {!r}: {!r}".format(name, snippet))
     cursor = connection.cursor()
     command = "insert into snippets values (%s, %s)"
@@ -22,8 +22,8 @@ def put(name, snippet):
   
 
 def get(name):
-    """Retrieve the snippet with a given name to return snippet. 
-    If snippet not found, return 404 snippet not found error"""
+    '''Retrieve the snippet with a given name to return snippet. 
+    If snippet not found, return 404 snippet not found error'''
     logging.info("Retrieving snippet {!r}".format(name))
     cursor = connection.cursor()
     command = "select message from snippets where keyword=%s"
@@ -37,6 +37,19 @@ def get(name):
     #logging.error("FIXME: Unimplemented - get({!r})".format(name))
     #return ""
     
+def catalogue():
+    '''Get the list of snippet names in order to search snippet by name'''
+    logging.info("Retrieving list of snippet name(s)")
+    cursor = connection.cursor()
+    command = "select keyword from snippets order by keyword desc"
+    cursor.execute(command, ())
+    results = cursor.fetchall()
+    keywords = ''
+    for keyword in results: 
+        keywords = keywords + keyword[0] + '; '
+    return keywords[:-1]
+        
+        
 
 def main():
     """Main function"""
@@ -55,7 +68,12 @@ def main():
     logging.debug("Constructing get subparser")
     get_parser = subparsers.add_parser("get", help="Retrieve a snippet")
     get_parser.add_argument("name", help="Name of the snippet")
-    #get_parser.add_argument("snippet", help="Snippet text")
+    
+    # Subparser for the catalogue command
+    logging.debug("Constructing catalogue subparser")
+    get_keys_parser = subparsers.add_parser("catalogue", help="Retrieve the list of names for snippets")
+    # no arguments required
+
 
     arguments = parser.parse_args()   
     # Convert parsed arguments from Namespace to dictionary
@@ -65,6 +83,9 @@ def main():
     if command == "put":
         name, snippet = put(**arguments)
         print("Stored {!r} as {!r}".format(snippet, name))
+    if command == "catalogue":
+        keywords = catalogue()
+        print("Retrieving all snippet names: {!r}".format(keywords))
     elif command == "get":
         snippet = get(**arguments)
         print("Retrieved snippet: {!r}".format(snippet))
