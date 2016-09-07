@@ -41,7 +41,7 @@ def catalogue():
     '''Get the list of snippet names in order to search snippet by name'''
     logging.info("Retrieving list of snippet name(s)")
     cursor = connection.cursor()
-    command = "select keyword from snippets order by keyword desc"
+    command = "select keyword from snippets order by keyword DESC"
     cursor.execute(command, ())
     results = cursor.fetchall()
     keywords = ''
@@ -49,7 +49,21 @@ def catalogue():
         keywords = keywords + keyword[0] + '; '
     return keywords[:-1]
         
-        
+def search(search_criteria):
+    '''Return any snippets that contain the given search criteria in message'''
+    logging.info("Retrieving snippets that contain {!r}".format(search_criteria))
+    cursor = connection.cursor()
+    command = "select message from snippets where message like %s"
+    cursor.execute(command, (search_criteria,))
+    results = cursor.fetchone()
+    print(results)
+    messages = results
+    if not messages:
+        return "404: Snippet Not Found"
+    #messages = ''
+    #for message in results:
+    #    messages = message + message[0] + '; '
+    return messages
 
 def main():
     """Main function"""
@@ -71,8 +85,14 @@ def main():
     
     # Subparser for the catalogue command
     logging.debug("Constructing catalogue subparser")
-    get_keys_parser = subparsers.add_parser("catalogue", help="Retrieve the list of names for snippets")
+    catalogue_parser = subparsers.add_parser("catalogue", help="Retrieve the list of names for snippets")
     # no arguments required
+    
+    # Subparser for the search command
+    logging.debug("Constructing search subparser")
+    search_parser = subparsers.add_parser("search", help="Search for a snippet that contains a given string")
+    search_parser.add_argument("search_criteria", help="A string within the snippet text")
+    
 
 
     arguments = parser.parse_args()   
@@ -86,6 +106,9 @@ def main():
     if command == "catalogue":
         keywords = catalogue()
         print("Retrieving all snippet names: {!r}".format(keywords))
+    if command == "search":
+        search_criteria = search(**arguments)
+        print("Retrieving all snippets that contain: {!r}".format(search_criteria))
     elif command == "get":
         snippet = get(**arguments)
         print("Retrieved snippet: {!r}".format(snippet))
