@@ -10,12 +10,12 @@ connection = psycopg2.connect(database="snippets")
 logging.debug("Database connection established.")
 
 
-def put(name, snippet):
+def put(name, snippet, hidden='false'):
     '''Store a snippet with an associated name.'''
     logging.info("Storing snippet {!r}: {!r}".format(name, snippet))
     cursor = connection.cursor()
-    command = "insert into snippets values (%s, %s)"
-    cursor.execute(command, (name, snippet))
+    command = "insert into snippets values (%s, %s, %s)"
+    cursor.execute(command, (name, snippet, hidden))
     connection.commit()
     logging.debug("Snippet stored successfully.")
     return name, snippet
@@ -26,7 +26,7 @@ def get(name):
     If snippet not found, return 404 snippet not found error'''
     logging.info("Retrieving snippet {!r}".format(name))
     cursor = connection.cursor()
-    command = "select message from snippets where keyword=%s"
+    command = "select message from snippets where keyword=%s and hidden='false'"
     cursor.execute(command, (name,))
     row = cursor.fetchone()
     if not row:
@@ -38,10 +38,10 @@ def get(name):
     #return ""
     
 def catalogue():
-    '''Get the list of snippet names in order to search snippet by name'''
-    logging.info("Retrieving list of snippet name(s)")
+    '''Get the list of public snippet names in order to search snippet by name'''
+    logging.info("Retrieving list of public snippet name(s)")
     cursor = connection.cursor()
-    command = "select keyword from snippets order by keyword DESC"
+    command = "select keyword from snippets where hidden='false' order by keyword DESC"
     cursor.execute(command, ())
     results = cursor.fetchall()
     if not results:
@@ -79,6 +79,7 @@ def main():
     put_parser = subparsers.add_parser("put", help="Store a snippet")
     put_parser.add_argument("name", help="Name of the snippet")
     put_parser.add_argument("snippet", help="Snippet text")
+    put_parser.add_argument("-hi", "--hide", help="Optional argument to hide snippet from being searched by name", action="store_true")
     
     # Subparser for the get command
     logging.debug("Constructing get subparser")
@@ -94,17 +95,20 @@ def main():
     logging.debug("Constructing search subparser")
     search_parser = subparsers.add_parser("search", help="Search for a snippet that contains a given string")
     search_parser.add_argument("search_criteria", help="A string within the snippet text")
-    
 
 
-    arguments = parser.parse_args()
+    args = parser.parse_args()
     # Convert parsed arguments from Namespace to dictionary
-    arguments = vars(arguments)
+    arguments = vars(args)
     command = arguments.pop("command")
 
     if command == "put":
-        name, snippet = put(**arguments)
-        print("Stored {!r} as {!r}".format(snippet, name))
+        if args.hide:
+            name, snippet = put(**arguments)
+            print("Stored hidden key as {!r} as {!r}".format(snippet, name))
+        else: 
+            name, snippet = put(**arguments)
+            print("Stored searchable key as {!r} as {!r}".format(snippet, name))
     if command == "catalogue":
         keywords = catalogue()
         print("Retrieving all snippet names: {!r}".format(keywords))
